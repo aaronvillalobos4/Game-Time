@@ -1,4 +1,3 @@
 crewai
 chainlit
 python-dotenv
-serper
