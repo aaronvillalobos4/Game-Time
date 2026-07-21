@@ -94,7 +94,7 @@ class TravelCrew:
         )
 
         task_flights = Task(
-            description=f"Search for flights from {self.inputs['origin']} to the match city for {self.inputs['date']}. Focus on arrival times, estimated costs, and airline options.",
+            description=f"Search for flights from {self.inputs['origin']} to the match city for {self.inputs['date']}. Standalone Flights: If the user only needs a flight, search across comprehensive options and output a clean Markdown button using a metasearch referral link (e.g., WayAway or Skyscanner parameters). Bundled Packages: If the user needs both a flight and a hotel stay, prioritize searching for a combined package deal via the Expedia Affiliate Network. Highlight the total savings of the bundle to the user. Focus on arrival times, estimated costs, and airline options.",
             expected_output="Flight options with flight numbers, times, and booking source names.",
             agent=self.flight_agent()
         )
