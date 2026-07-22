@@ -2,6 +2,14 @@ import os
 import chainlit as cl
 from dotenv import load_dotenv
 from agents import TravelCrew
+from flask import Flask, render_template
+
+app = Flask(__name__)
+
+
+@app.route("/")
+def home():
+    return render_template("index.html")
 
 # Load environment keys from our secret .env file
 load_dotenv()
