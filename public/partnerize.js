@@ -1,9 +1,18 @@
-// Inject Impact.com / SeatGeek verification tag
+// Inject Impact.com / SeatGeek verification meta tags
 if (!document.querySelector("meta[name='impact-site-verification']")) {
-    var meta = document.createElement('meta');
-    meta.name = 'impact-site-verification';
-    meta.value = '1b0abe48-699c-47a5-afd2-96fe2538979b';
-    document.getElementsByTagName('head')[0].appendChild(meta);
+    var head = document.getElementsByTagName('head')[0];
+    
+    // Tag 1: Real token
+    var meta1 = document.createElement('meta');
+    meta1.name = 'impact-site-verification';
+    meta1.setAttribute('value', '1b0abe48-699c-47a5-afd2-96fe2538979b');
+    head.appendChild(meta1);
+
+    // Tag 2: Fallback for Impact's UI glitch
+    var meta2 = document.createElement('meta');
+    meta2.name = 'impact-site-verification';
+    meta2.setAttribute('value', 'undefined');
+    head.appendChild(meta2);
 }
 (function () {
     // Define dummy/fallback pzthc function if Partnerize script expects it
