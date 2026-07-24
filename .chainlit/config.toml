@@ -51,7 +51,7 @@ auto_tag_thread = true
 
 [UI]
 name = "Game Time"
-custom_head = ".chainlit/head.html"
+custom_js = "/public/partnerize.js"
 
 # Description of the assistant. This is used for HTML tags.
 # description = ""
