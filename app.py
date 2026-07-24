@@ -18,21 +18,24 @@ PARTNERIZE_SCRIPT = """
 </script>
 """
 
-@app.middleware("http")
-async def inject_partnerize_tag(request, call_next):
-    response = await call_next(request)
-    
-    # Only modify root HTML page requests
-    if request.url.path == "/" and response.headers.get("content-type", "").startswith("text/html"):
-        body = [chunk async for chunk in response.body_iterator]
-        html_content = b"".join(body).decode("utf-8")
-        
-        if "</head>" in html_content and PARTNERIZE_SCRIPT not in html_content:
-            html_content = html_content.replace("</head>", f"{PARTNERIZE_SCRIPT}\n</head>")
-            
-        return HTMLResponse(content=html_content, status_code=response.status_code)
-        
-    return response
+@cl.on_chat_start
+async def on_chat_start():
+    js_code = """
+    if (!document.getElementById('partnerize-tag')) {
+        const script = document.createElement('script');
+        script.id = 'partnerize-tag';
+        script.text = `
+            (function () {
+                var pztt = 3;
+                var pztp = {"p":"pzt","mi":0,"ma":99,"e":[]};
+                var tid = 'c7b6e1e8-98ca-4d8c-acd9-c2d6c30fc6bd';
+                // ... your Partnerize code ...
+            })();
+        `;
+        document.head.appendChild(script);
+    }
+    """
+    await cl.run_js(js_code)
 
 app = Flask(__name__)
 
