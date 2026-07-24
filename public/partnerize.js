@@ -1,3 +1,10 @@
+// Inject Impact.com / SeatGeek site verification meta tag
+if (!document.querySelector("meta[name='impact-site-verification']")) {
+    var meta = document.createElement('meta');
+    meta.name = 'impact-site-verification';
+    meta.value = '1b0abe48-699c-47a5-afd2-96fe2538979b';
+    document.getElementsByTagName('head')[0].appendChild(meta);
+}
 (function () {
     // Define dummy/fallback pzthc function if Partnerize script expects it
     window.pzthc = window.pzthc || function () {};
