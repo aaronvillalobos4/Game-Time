@@ -53,7 +53,7 @@ auto_tag_thread = true
 custom_head = ".chainlit/head.html"
 
 # Name of the assistant.
-name = "Assistant"
+name = "Game Time"
 
 # Description of the assistant. This is used for HTML tags.
 # description = ""
