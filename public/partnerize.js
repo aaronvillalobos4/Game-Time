@@ -1,4 +1,7 @@
 (function () {
+    // Define dummy/fallback pzthc function if Partnerize script expects it
+    window.pzthc = window.pzthc || function () {};
+
     var pztt = 3;
     var pztp = {"p":"pzt","mi":0,"ma":99,"e":[]};
     var tid = 'c7b6e1e8-98ca-4d8c-acd9-c2d6c30fc6bd';
@@ -34,7 +37,12 @@
         if (pztt <= 0) return;
         var s = document.createElement('script');
         s.onerror = function () { pztt--; pzti(); };
-        s.onload = function () { l = true; pzthc(); };
+        s.onload = function () { 
+            l = true; 
+            if (typeof window.pzthc === 'function') {
+                window.pzthc();
+            }
+        };
         var d;
         pztd().then(function (domain) {
             d = domain;
@@ -42,7 +50,9 @@
             document.body.appendChild(s);
         }).catch(function () {
             e.push({ error: 'Load failed from ' + d, parameter: '' });
-            pzthc();
+            if (typeof window.pzthc === 'function') {
+                window.pzthc();
+            }
         });
     };
 
