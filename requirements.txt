@@ -1,3 +1,4 @@
 crewai
 chainlit
 python-dotenv
+echo flask >> requirements.txt
