@@ -2,6 +2,35 @@ import os
 import chainlit as cl
 from dotenv import load_dotenv
 from agents import TravelCrew
+from chainlit.server import app
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import Response
+
+class InjectMetaTagMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        # Only modify HTML responses for the root / page
+        if request.url.path == "/" and "text/html" in response.headers.get("content-type", ""):
+            body = b""
+            async for chunk in response.body_iterator:
+                body += chunk
+            
+            meta_tag = b'<meta name="impact-site-verification" value="1b0abe48-699c-47a5-afd2-96fe2538979b">'
+            # Inject meta tag right before </head>
+            if b"</head>" in body:
+                body = body.replace(b"</head>", meta_tag + b"</head>")
+            elif b"<head>" in body:
+                body = body.replace(b"<head>", b"<head>" + meta_tag)
+                
+            return Response(
+                content=body,
+                status_code=response.status_code,
+                headers=dict(response.headers),
+                media_type=response.media_type
+            )
+        return response
+
+app.add_middleware(InjectMetaTagMiddleware)
 
 load_dotenv()
 
