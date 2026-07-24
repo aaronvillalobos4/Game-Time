@@ -1,4 +1,4 @@
-// Inject Impact.com / SeatGeek site verification meta tag
+// Inject Impact.com / SeatGeek verification tag
 if (!document.querySelector("meta[name='impact-site-verification']")) {
     var meta = document.createElement('meta');
     meta.name = 'impact-site-verification';
