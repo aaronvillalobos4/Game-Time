@@ -2,59 +2,21 @@ import os
 import chainlit as cl
 from dotenv import load_dotenv
 from agents import TravelCrew
-from flask import Flask, render_template
-import chainlit as cl
-from chainlit.server import app
-from starlette.responses import HTMLResponse
 
-PARTNERIZE_SCRIPT = """
-<script>
-  (function () {
-      var pztt = 3;
-      var pztp = {"p":"pzt","mi":0,"ma":99,"e":[]};
-      var tid = 'c7b6e1e8-98ca-4d8c-acd9-c2d6c30fc6bd';
-      // ... your Partnerize script ...
-  })();
-</script>
-"""
-
-@cl.on_chat_start
-async def on_chat_start():
-    js_code = """
-    if (!document.getElementById('partnerize-tag')) {
-        const script = document.createElement('script');
-        script.id = 'partnerize-tag';
-        script.text = `
-            (function () {
-                var pztt = 3;
-                var pztp = {"p":"pzt","mi":0,"ma":99,"e":[]};
-                var tid = 'c7b6e1e8-98ca-4d8c-acd9-c2d6c30fc6bd';
-                // ... your Partnerize code ...
-            })();
-        `;
-        document.head.appendChild(script);
-    }
-    """
-    await cl.run_js(js_code)
-
-app = Flask(__name__)
-
-
-@app.route("/")
-def home():
-    return render_template("index.html")
-
-# Load environment keys from our secret .env file
+# Load environment keys from secret .env file
 load_dotenv()
+
 
 @cl.on_chat_start
 async def start():
+    # Send welcome message when a user starts a chat session
     await cl.Message(
         content="🏆 **Welcome to Game Time!**\n"
                 "I will help you plan your entire sports trip. To get started, please tell me your criteria in this exact format:\n\n"
                 "`Game, Date, Departure City, Total Budget`\n\n"
                 "Example: `Mavericks @ Celtics, March 14, Austin, $1200`"
     ).send()
+
 
 @cl.on_message
 async def main(message: cl.Message):
@@ -81,12 +43,12 @@ async def main(message: cl.Message):
             ).send()
             return
 
-    await cl.Message(content=f"🔄 Gathering options for **{session_data['game']}**... My specialist sub-agents are searching tickets, flights, and hotels using Google Search right now! Please wait a moment...").send()
+    await cl.Message(
+        content=f"🔄 Gathering options for **{session_data['game']}**... My specialist sub-agents are searching tickets, flights, and hotels using Google Search right now! Please wait a moment..."
+    ).send()
     
-    # Run our background Crew
+    # Run background Crew
     planner = TravelCrew(inputs=session_data)
-    
-    # Add 'await' right here to match our new async function
     final_itinerary = await planner.run()
     
     await cl.Message(
