@@ -7,29 +7,27 @@ from agents import TravelCrew
 
 load_dotenv()
 
-# Read the custom head HTML snippet if it exists
+# Read Partnerize head HTML snippet
 HEAD_FILE_PATH = os.path.join(".chainlit", "head.html")
 CUSTOM_HEAD_HTML = ""
 if os.path.exists(HEAD_FILE_PATH):
     with open(HEAD_FILE_PATH, "r", encoding="utf-8") as f:
         CUSTOM_HEAD_HTML = f.read()
 
-# FastAPI / Starlette middleware to inject <script> into the <head>
-@app.middleware("http")
-async def inject_partnerize_script(request, call_next):
-    response = await call_next(request)
+# Serve root index cleanly with Partnerize tag injected
+@app.get("/", response_class=HTMLResponse)
+async def serve_index():
+    # Path to Chainlit's built index.html page
+    index_path = os.path.join(os.path.dirname(cl.__file__), "frontend", "dist", "index.html")
     
-    # Only modify root HTML page requests
-    if request.url.path in ["/", "/index.html"] and "text/html" in response.headers.get("content-type", ""):
-        body = [chunk async for chunk in response.body_iterator]
-        html_content = b"".join(body).decode("utf-8")
-        
+    if os.path.exists(index_path):
+        with open(index_path, "r", encoding="utf-8") as f:
+            html_content = f.read()
         if "</head>" in html_content and CUSTOM_HEAD_HTML:
             html_content = html_content.replace("</head>", f"{CUSTOM_HEAD_HTML}\n</head>")
-            
-        return HTMLResponse(content=html_content, status_code=response.status_code, headers=dict(response.headers))
-        
-    return response
+        return HTMLResponse(content=html_content)
+    
+    return HTMLResponse(content="<h1>Game Time</h1>", status_code=200)
 
 
 @cl.on_chat_start
