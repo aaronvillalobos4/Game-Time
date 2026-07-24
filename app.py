@@ -3,6 +3,42 @@ import chainlit as cl
 from dotenv import load_dotenv
 from agents import TravelCrew
 from flask import Flask, render_template
+import chainlit as cl
+from chainlit.server import app
+from starlette.responses import HTMLResponse
+
+# Define your Partnerize tracking script snippet
+PARTNERIZE_SCRIPT = """
+<script>
+  (function () {
+      var pztt = 3;
+      var pztp = {"p":"pzt","mi":0,"ma":99,"e":[]};
+      var tid = 'c7b6e1e8-98ca-4d8c-acd9-c2d6c30fc6bd';
+      // ... rest of your Partnerize snippet ...
+  })();
+</script>
+"""
+
+# Middleware to dynamically inject the script into the HTML <head>
+@app.middleware("http")
+async def inject_partnerize_tag(request, call_next):
+    response = await call_next(request)
+    
+    # Only modify HTML responses for root/app routes
+    if response.headers.get("content-type", "").startswith("text/html"):
+        body = b""
+        async for chunk in response.body_iterator:
+            body += chunk
+        
+        html_content = body.decode("utf-8")
+        
+        # Inject the script directly before </head>
+        if "</head>" in html_content and PARTNERIZE_SCRIPT not in html_content:
+            html_content = html_content.replace("</head>", f"{PARTNERIZE_SCRIPT}\n</head>")
+            
+        return HTMLResponse(content=html_content, status_code=response.status_code)
+        
+    return response
 
 app = Flask(__name__)
 

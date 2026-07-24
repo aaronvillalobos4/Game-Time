@@ -4,6 +4,7 @@ import requests
 from crewai import Agent, Task, Crew, Process
 from crewai.tools import tool
 
+
 # ==========================================
 # CUSTOM SEARCH SCRAPING TOOL (Option 1)
 # ==========================================
